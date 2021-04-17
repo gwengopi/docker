@@ -34,3 +34,13 @@ Deploy a test container using the image just created
 Create the weather-app container
 
 sudo docker container run -d --name weather-app -p 80803000 linuxacademyweather-appHASH
+
+###Volume releated commands ###
+   13  docker image build -f Dockerfile
+   14  docker image build -t app:v1.0 .
+   15  docker image ls
+   16  docker image history node
+   17  docker volume create /app/volume - error
+   18  docker volume create app
+   19  docker volume ls
+   20  docker volume inspect app
