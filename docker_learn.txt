@@ -1,0 +1,36 @@
+#create image and container
+
+#Create a docker file
+
+vi Dockerfile
+Dockerfile contents
+
+FROM node AS source
+RUN mkdir -p nodeweather-app
+ADD src nodeweather-app
+WORKDIR nodeweather-app
+RUN npm install
+
+FROM nodealpine
+ARG APP_VERSION=V1.1
+LABEL org.label-schema.version=$APP_VERSION
+ENV NODE_ENV=production
+COPY --from=source nodeweather-app nodeweather-app
+WORKDIR nodeweather-app
+EXPOSE 3000
+ENTRYPOINT [.binwww]
+
+Build the image
+Use Git commit hash as the image tag
+
+cd src
+git log -1 --pretty=%H
+cd ..
+Build the image
+
+sudo docker image build -t linuxacademyweather-app[HASH] --build-arg APP_VERSION=2.0 .
+
+Deploy a test container using the image just created
+Create the weather-app container
+
+sudo docker container run -d --name weather-app -p 80803000 linuxacademyweather-appHASH
