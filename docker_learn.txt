@@ -44,3 +44,31 @@ sudo docker container run -d --name weather-app -p 80803000 linuxacademyweather-
    18  docker volume create app
    19  docker volume ls
    20  docker volume inspect app
+   
+   
+   
+   
+# Create Secrets
+Back in the manager node, we need to create the MySQL root password:
+
+[cloud_user@manager]$ openssl rand -base64 20 > mysql_root_password.txt
+[cloud_user@manager]$ docker secret create mysql_root_password mysql_root_password.txt
+Create a MySQL user password:
+
+[cloud_user@manager]$ openssl rand -base64 20 > mysql_password.txt
+[cloud_user@manager]$ docker secret create mysql_password mysql_password.txt
+Create an Overlay Network for the Service
+[cloud_user@manager]$ docker network create -d overlay mysql_private
+Create the MySQL Service
+[cloud_user@manager]$ docker service create \
+     --name mysql_secrets \
+     --replicas 1 \
+     --network mysql_private \
+     --mount type=volume,destination=/var/lib/mysql \
+     --secret mysql_root_password \
+     --secret mysql_password \
+     -e MYSQL_ROOT_PASSWORD_FILE="/run/secrets/mysql_root_password" \
+     -e MYSQL_PASSWORD_FILE="/run/secrets/mysql_password" \
+     -e MYSQL_USER="myUser" \
+     -e MYSQL_DATABASE="myDB" \
+     mysql:5.7
